@@ -26,7 +26,11 @@ class HuggingFaceEmbeddingService(EmbeddingService):
                 self.model.encode, 
                 text
             )
-            return embedding.tolist()
+            # Ensure we return a Python list, not a NumPy array
+            if hasattr(embedding, 'tolist'):
+                return embedding.tolist()
+            else:
+                return list(embedding)
         except Exception as e:
             logger.error("Failed to generate embedding", error=str(e), text=text[:100])
             raise
@@ -40,7 +44,11 @@ class HuggingFaceEmbeddingService(EmbeddingService):
                 self.model.encode, 
                 texts
             )
-            return [emb.tolist() for emb in embeddings]
+            # Ensure we return Python lists, not NumPy arrays
+            if hasattr(embeddings, 'tolist'):
+                return embeddings.tolist()
+            else:
+                return [list(emb) for emb in embeddings]
         except Exception as e:
             logger.error("Failed to generate batch embeddings", error=str(e), batch_size=len(texts))
             raise

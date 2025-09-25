@@ -26,7 +26,7 @@ class SQLDocumentRepository(DocumentRepository):
             content=model.content,
             category=model.category,
             tags=model.tags or [],
-            embedding=list(model.embedding) if model.embedding else None,
+            embedding=list(model.embedding) if model.embedding is not None else None,
             created_at=model.created_at,
             updated_at=model.updated_at,
             is_active=model.is_active
@@ -123,9 +123,11 @@ class SQLDocumentRepository(DocumentRepository):
     async def search_by_embedding(self, embedding: List[float], limit: int = 10) -> List[Document]:
         """Search documents by embedding similarity."""
         try:
+            from ..config import settings
             models = self.session.query(DocumentModel).filter(
                 DocumentModel.is_active == True,
-                DocumentModel.embedding.is_not(None)
+                DocumentModel.embedding.is_not(None),
+                DocumentModel.embedding.cosine_distance(embedding) < settings.similarity_threshold
             ).order_by(
                 DocumentModel.embedding.cosine_distance(embedding)
             ).limit(limit).all()
@@ -166,7 +168,7 @@ class SQLTicketRepository(TicketRepository):
             priority=model.priority,
             category=model.category,
             tags=model.tags or [],
-            embedding=list(model.embedding) if model.embedding else None,
+            embedding=list(model.embedding) if model.embedding is not None else None,
             created_at=model.created_at,
             updated_at=model.updated_at
         )
@@ -267,8 +269,10 @@ class SQLTicketRepository(TicketRepository):
     async def search_by_embedding(self, embedding: List[float], limit: int = 10) -> List[Ticket]:
         """Search tickets by embedding similarity."""
         try:
+            from ..config import settings
             models = self.session.query(TicketModel).filter(
-                TicketModel.embedding.is_not(None)
+                TicketModel.embedding.is_not(None),
+                TicketModel.embedding.cosine_distance(embedding) < settings.similarity_threshold
             ).order_by(
                 TicketModel.embedding.cosine_distance(embedding)
             ).limit(limit).all()
@@ -294,7 +298,7 @@ class SQLFAQRepository(FAQRepository):
             answer=model.answer,
             category=model.category,
             tags=model.tags or [],
-            embedding=list(model.embedding) if model.embedding else None,
+            embedding=list(model.embedding) if model.embedding is not None else None,
             view_count=model.view_count,
             helpful_count=model.helpful_count,
             created_at=model.created_at,
@@ -397,9 +401,12 @@ class SQLFAQRepository(FAQRepository):
     async def search_by_embedding(self, embedding: List[float], limit: int = 10) -> List[FAQ]:
         """Search FAQs by embedding similarity."""
         try:
+            from ..config import settings
+            # Use configurable similarity threshold to avoid returning irrelevant results
             models = self.session.query(FAQModel).filter(
                 FAQModel.is_active == True,
-                FAQModel.embedding.is_not(None)
+                FAQModel.embedding.is_not(None),
+                FAQModel.embedding.cosine_distance(embedding) < settings.similarity_threshold
             ).order_by(
                 FAQModel.embedding.cosine_distance(embedding)
             ).limit(limit).all()
@@ -442,7 +449,7 @@ class SQLQueryRepository(QueryRepository):
             id=model.id,
             user_id=model.user_id,
             query_text=model.query_text,
-            embedding=list(model.embedding) if model.embedding else None,
+            embedding=list(model.embedding) if model.embedding is not None else None,
             response=model.response,
             sources=model.sources or [],
             confidence_score=model.confidence_score,

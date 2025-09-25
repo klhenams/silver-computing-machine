@@ -15,8 +15,8 @@ router = APIRouter(prefix="/faqs", tags=["faqs"])
 
 def get_faq_service() -> FAQService:
     """Dependency to get FAQ service."""
-    # This will be implemented in the main app with proper DI
-    pass
+    # This will be overridden in main.py with proper DI
+    raise HTTPException(status_code=500, detail="FAQ service not configured")
 
 
 @router.post("/", response_model=FAQResponse, status_code=201)

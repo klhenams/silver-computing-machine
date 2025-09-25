@@ -1,5 +1,5 @@
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 import uuid
 
@@ -14,8 +14,8 @@ class Document:
     category: str = ""
     tags: List[str] = field(default_factory=list)
     embedding: Optional[List[float]] = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     is_active: bool = True
 
     def update_content(self, title: str, content: str, category: str, tags: List[str]) -> None:
@@ -24,7 +24,7 @@ class Document:
         self.content = content
         self.category = category
         self.tags = tags
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
         self.embedding = None  # Reset embedding when content changes
 
     def set_embedding(self, embedding: List[float]) -> None:
@@ -45,8 +45,8 @@ class Ticket:
     category: str = ""
     tags: List[str] = field(default_factory=list)
     embedding: Optional[List[float]] = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def update_status(self, status: str) -> None:
         """Update ticket status."""
@@ -54,7 +54,7 @@ class Ticket:
         if status not in valid_statuses:
             raise ValueError(f"Invalid status. Must be one of: {valid_statuses}")
         self.status = status
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def update_priority(self, priority: str) -> None:
         """Update ticket priority."""
@@ -62,7 +62,7 @@ class Ticket:
         if priority not in valid_priorities:
             raise ValueError(f"Invalid priority. Must be one of: {valid_priorities}")
         self.priority = priority
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def set_embedding(self, embedding: List[float]) -> None:
         """Set the ticket embedding vector."""
@@ -81,8 +81,8 @@ class FAQ:
     embedding: Optional[List[float]] = None
     view_count: int = 0
     helpful_count: int = 0
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     is_active: bool = True
 
     def increment_views(self) -> None:
@@ -99,7 +99,7 @@ class FAQ:
         self.answer = answer
         self.category = category
         self.tags = tags
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
         self.embedding = None  # Reset embedding when content changes
 
     def set_embedding(self, embedding: List[float]) -> None:
@@ -119,7 +119,7 @@ class Query:
     sources: List[str] = field(default_factory=list)
     confidence_score: Optional[float] = None
     feedback_rating: Optional[int] = None  # 1-5 rating
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def set_response(self, response: str, sources: List[str], confidence_score: float) -> None:
         """Set the query response and metadata."""

@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from pgvector.sqlalchemy import Vector
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 
@@ -22,8 +22,8 @@ class DocumentModel(Base):
     category = Column(String(50), nullable=False)
     tags = Column(ARRAY(String), default=list)
     embedding = Column(Vector(384))  # Assuming 384-dimensional embeddings
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     is_active = Column(Boolean, default=True)
 
 
@@ -41,8 +41,8 @@ class TicketModel(Base):
     category = Column(String(50), nullable=False)
     tags = Column(ARRAY(String), default=list)
     embedding = Column(Vector(384))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 
 class FAQModel(Base):
@@ -58,8 +58,8 @@ class FAQModel(Base):
     embedding = Column(Vector(384))
     view_count = Column(Integer, default=0)
     helpful_count = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     is_active = Column(Boolean, default=True)
 
 
@@ -76,7 +76,7 @@ class QueryModel(Base):
     sources = Column(ARRAY(String), default=list)
     confidence_score = Column(Float, nullable=True)
     feedback_rating = Column(Integer, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class DatabaseConfig:

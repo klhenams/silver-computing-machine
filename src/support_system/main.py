@@ -98,17 +98,17 @@ def get_query_service(session: Session = Depends(get_database_session)) -> Query
     return container.get_query_service(session)
 
 
-# Override the dependencies in the routers
-documents.get_document_service = get_document_service
-tickets.get_ticket_service = get_ticket_service
-faqs.get_faq_service = get_faq_service
-queries.get_query_service = get_query_service
-
 # Include routers
 app.include_router(documents.router, prefix="/api/v1")
 app.include_router(tickets.router, prefix="/api/v1")
 app.include_router(faqs.router, prefix="/api/v1")
 app.include_router(queries.router, prefix="/api/v1")
+
+# Override the dependencies using FastAPI's dependency override system
+app.dependency_overrides[documents.get_document_service] = get_document_service
+app.dependency_overrides[tickets.get_ticket_service] = get_ticket_service
+app.dependency_overrides[faqs.get_faq_service] = get_faq_service
+app.dependency_overrides[queries.get_query_service] = get_query_service
 
 
 @app.get("/")

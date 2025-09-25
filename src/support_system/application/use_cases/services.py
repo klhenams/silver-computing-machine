@@ -337,21 +337,25 @@ class FAQServiceImpl(FAQService):
         
         # Search by embedding similarity
         similar_faqs = await self.faq_repo.search_by_embedding(
-            query_embedding, request.limit
+            query_embedding, request.limit * 2  # Get more results for filtering
         )
         
         # Also search by text as fallback
-        text_faqs = await self.faq_repo.search_by_text(request.query, request.limit)
+        text_faqs = await self.faq_repo.search_by_text(request.query, request.limit * 2)
         
         # Combine and deduplicate results
         all_faqs = {faq.id: faq for faq in similar_faqs + text_faqs}
         
-        # Filter by category if specified
-        if request.category:
+        # Filter by category if specified, but only if we have relevant results
+        if request.category and all_faqs:
             all_faqs = {
                 faq_id: faq for faq_id, faq in all_faqs.items() 
                 if faq.category == request.category
             }
+        
+        # If no relevant results found and category is specified, don't return random FAQs
+        if not all_faqs and request.category:
+            all_faqs = {}
         
         results = [
             {
