@@ -19,7 +19,6 @@ A modern support system that combines REST APIs with Large Language Models (LLMs
 - **LLM Provider**: Hugging Face Inference API
 - **Embeddings**: Sentence Transformers
 - **Containerization**: Docker & Docker Compose
-- **Reverse Proxy**: Nginx
 - **Architecture**: Clean Architecture (Domain, Application, Infrastructure, Presentation)
 
 ## Project Structure

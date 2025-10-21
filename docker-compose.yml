@@ -34,16 +34,5 @@ services:
       - ./src:/app/src
     restart: unless-stopped
 
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - support-api
-    restart: unless-stopped
-
 volumes:
   postgres_data:
