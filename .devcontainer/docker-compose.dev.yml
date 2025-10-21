@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  support-api:
+    build:
+      target: development
+    environment:
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      - PYTHONPATH=/app/src
+    volumes:
+      - ..:/app:cached
+      - /app/.venv
+    command: sleep infinity
+    # Override the default command to keep container running for development
+    stdin_open: true
+    tty: true
+    
+  postgres:
+    environment:
+      - POSTGRES_DB=support_system
+      - POSTGRES_USER=postgres  
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"

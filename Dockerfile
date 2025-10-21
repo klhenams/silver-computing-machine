@@ -1,4 +1,5 @@
-FROM python:3.9-slim
+# Base stage with common dependencies
+FROM python:3.11-slim as base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -11,6 +12,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    curl \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
@@ -18,6 +21,27 @@ WORKDIR /app
 
 # Copy dependency files
 COPY requirements.txt pyproject.toml ./
+
+# Development stage
+FROM base as development
+
+# Install development dependencies
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install -e .[dev] 2>/dev/null || pip install pytest pytest-asyncio black isort flake8 mypy pre-commit
+
+# Create non-root user for development
+RUN adduser --disabled-password --gecos '' --uid 1000 vscode && \
+    chown -R vscode:vscode /app
+USER vscode
+
+# Expose port
+EXPOSE 8000
+
+# Keep container running for development
+CMD ["sleep", "infinity"]
+
+# Production stage  
+FROM base as production
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
